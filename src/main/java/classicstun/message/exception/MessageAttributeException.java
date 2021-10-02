@@ -1,7 +1,7 @@
 package classicstun.message.exception;
 
 /**
- * @author JiangSenwei
+ * @author JiangZhenli
  */
 public class MessageAttributeException extends MessageExcepion {
     public MessageAttributeException(String mesg) {

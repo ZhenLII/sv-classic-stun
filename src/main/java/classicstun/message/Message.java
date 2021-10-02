@@ -6,7 +6,7 @@ import classicstun.message.enums.MessageAttributeType;
 import java.util.Map;
 
 /**
- * @author JiangSenwei
+ * @author JiangZhenli
  */
 public class Message {
     MessageHeader header;

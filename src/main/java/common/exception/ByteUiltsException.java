@@ -1,7 +1,7 @@
 package common.exception;
 
 /**
- * @author JiangSenwei
+ * @author JiangZhenli
  */
 public class ByteUiltsException extends Exception {
     public ByteUiltsException(String msg) {

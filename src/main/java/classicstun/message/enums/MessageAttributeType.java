@@ -1,9 +1,13 @@
 package classicstun.message.enums;
 
 /**
- * @author JiangSenwei
+ * @author JiangZhenli
  */
 public enum MessageAttributeType {
+
+    /**
+     *  用于标识Message中的属性类型
+     * */
 
     MAPPED_ADDRESS(0x0001),
     RESPONSE_ADDRESS(0x0002),
@@ -17,13 +21,18 @@ public enum MessageAttributeType {
     UNKNOWN_ATTRIBUTES(0x000a),
     REFLECTED_FROM(0x000b);
 
-    private int value;
+    public final int value;
 
     MessageAttributeType(int value) {
         this.value = value;
     }
 
-    public int value() {
-        return value;
+    public static MessageAttributeType of(int value) {
+        for(MessageAttributeType t : values()) {
+            if(t.value == value) {
+                return t;
+            }
+        }
+        return null;
     }
 }

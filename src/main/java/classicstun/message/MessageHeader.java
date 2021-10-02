@@ -24,7 +24,7 @@ import java.util.UUID;
  *
  * Message Header格式
  * 参见 RFC3489
- * @author JiangSenwei
+ * @author JiangZhenli
  */
 class MessageHeader {
     private MessageHeaderType messageType;

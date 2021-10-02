@@ -1,7 +1,7 @@
 package classicstun.message.enums;
 
 /**
- * @author JiangSenwei
+ * @author JiangZhenli
  */
 public enum ErrorCode {
     BadRequest(400,"Bad Request"),

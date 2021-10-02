@@ -7,20 +7,17 @@ import java.net.Inet4Address;
 /**
  * @author JiangZhenli
  */
-public class MappedAddress extends AddressAttribute {
-
-    public MappedAddress(int port, Inet4Address ipAddress) {
-        super(MessageAttributeType.MAPPED_ADDRESS, port, ipAddress);
+public class ChangedAddress extends AddressAttribute{
+    public ChangedAddress(int port, Inet4Address ipAddress) {
+        super(MessageAttributeType.CHANGED_ADDRESS, port, ipAddress);
     }
-
 
     @Override
     public byte[] encode() {
         return new byte[0];
     }
 
-
-    public static MappedAddress decode(byte[] bytes) {
+    public static ChangedAddress decode(byte[] bytes) {
         return null;
     }
 }
