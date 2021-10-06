@@ -4,12 +4,11 @@ import classicstun.message.enums.MessageAttributeType;
 import classicstun.message.exception.MessageAttributeException;
 import common.exception.ByteUiltsException;
 import common.utils.ByteUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,18 +16,25 @@ import java.util.Map;
  * @author JiangZhenli
  */
 public abstract class MessageAttribute {
-
-    private final static Map<Integer,Class> ADDRESS_TYPE = Map.of(
-            MessageAttributeType.MAPPED_ADDRESS.value, MappedAddress.class,
-            MessageAttributeType.RESPONSE_ADDRESS.value, ResponseAddress.class,
-            MessageAttributeType.SOURCE_ADDRESS.value, SourceAddress.class,
-            MessageAttributeType.CHANGED_ADDRESS.value, ChangedAddress.class,
-            MessageAttributeType.REFLECTED_FROM.value, ReflectedFrom.class
-    );
+    private static Logger log = LoggerFactory.getLogger(MessageAttribute.class);
+    private final static Map<MessageAttributeType, Class<?>> MESSAGE_TYPE = new HashMap<>() {{
+        MESSAGE_TYPE.put(MessageAttributeType.MAPPED_ADDRESS, MappedAddress.class);
+        MESSAGE_TYPE.put(MessageAttributeType.RESPONSE_ADDRESS, ResponseAddress.class);
+        MESSAGE_TYPE.put(MessageAttributeType.CHANGE_REQUEST, ChangeRequest.class);
+        MESSAGE_TYPE.put(MessageAttributeType.SOURCE_ADDRESS, SourceAddress.class);
+        MESSAGE_TYPE.put(MessageAttributeType.CHANGED_ADDRESS, ChangedAddress.class);
+        MESSAGE_TYPE.put(MessageAttributeType.USERNAME, Username.class);
+        MESSAGE_TYPE.put(MessageAttributeType.PASSWORD, Password.class);
+        MESSAGE_TYPE.put(MessageAttributeType.MESSAGE_INTEGRITY, MessageIntegrity.class);
+        MESSAGE_TYPE.put(MessageAttributeType.ERROR_CODE, ErrorCode.class);
+        MESSAGE_TYPE.put(MessageAttributeType.UNKNOWN_ATTRIBUTES, UnknowAttribute.class);
+        MESSAGE_TYPE.put(MessageAttributeType.REFLECTED_FROM, ReflectedFrom.class);
+    }};
 
     private MessageAttributeType type;
     int length;
     byte[] value;
+
 
     MessageAttribute(MessageAttributeType type) {
         this.type = type;
@@ -40,12 +46,23 @@ public abstract class MessageAttribute {
 
     public abstract byte[] encode();
 
+    /**
+     * 将消息中的属性数据解析到对象中
+     * @param attrValueData TLV结构中的 V value
+     * */
+    abstract void decode(byte[] attrValueData) throws MessageAttributeException;
+
+    void setValue (byte[] attrValueData) {
+        this.length = attrValueData.length;
+        this.value = attrValueData;
+    }
 
     /**
      * 解析MessageHeader后的MessageAttribute
+     *
      * @param bytes 不包括MessageHeader的报文剩余数据
      */
-    public static List<MessageAttribute> parse(byte[] bytes) throws MessageAttributeException, UnknownHostException, ReflectiveOperationException {
+    public static List<MessageAttribute> parse(byte[] bytes) throws MessageAttributeException {
         if (bytes == null || bytes.length == 0) {
             return null;
         }
@@ -89,56 +106,21 @@ public abstract class MessageAttribute {
 
 
                 MessageAttributeType typeEnum = MessageAttributeType.of(type);
-                if(typeEnum == null) {
+                if (typeEnum == null) {
                     throw new MessageAttributeException("Invalid Attribute Type");
                 }
 
-                switch (typeEnum) {
-                    case MAPPED_ADDRESS:
-                    case RESPONSE_ADDRESS:
-                    case SOURCE_ADDRESS:
-                    case CHANGED_ADDRESS:
-                    case REFLECTED_FROM:
-                        attributes.add(decodeAddressData(type,value));
-                        break;
-                    // TODO Other Attributes
-                    default:
-                }
+                MessageAttribute attribute =
+                        (MessageAttribute) MESSAGE_TYPE.get(typeEnum).getConstructor().newInstance();
+                attribute.decode(value);
+                attributes.add(attribute);
 
             }
-        } catch (ByteUiltsException e) {
-            e.printStackTrace();
+        } catch (ByteUiltsException | ReflectiveOperationException e) {
+            log.error(e.getMessage(),e);
+            throw new MessageAttributeException("Message Attribute Parse Error");
         }
         return attributes;
-    }
-
-    private static AddressAttribute decodeAddressData(int type, byte[] addrValueData) throws MessageAttributeException, UnknownHostException, ByteUiltsException, ReflectiveOperationException {
-        if(!ADDRESS_TYPE.keySet().contains(type)) {
-            throw new MessageAttributeException("Address Attribute Type Error.");
-        }
-        if(addrValueData.length != 8) {
-            throw new MessageAttributeException("Address Attribute Length Error.");
-        }
-        int family = addrValueData[1];
-        if(family != AddressAttribute.ADDRESS_FAMILY) {
-            throw new MessageAttributeException("Address Attribute Family Error.");
-        }
-        byte[] portData = new byte[2];
-        byte[] addressData = new byte[4];
-        System.arraycopy(addrValueData,3,portData,0,2);
-        System.arraycopy(addrValueData,5,addressData,0,4);
-
-
-        int port = ByteUtils.twoBytesToInteger(portData);
-        Inet4Address ipv4Address = (Inet4Address) Inet4Address.getByAddress(addressData);
-        AddressAttribute addressAttribute =
-                (AddressAttribute) ADDRESS_TYPE.get(type).getConstructor(Inet4Address.class,int.class).newInstance(ipv4Address,port);
-
-        addressAttribute.length = addrValueData.length;
-        addressAttribute.value = addrValueData;
-
-        return addressAttribute;
-
     }
 
 }

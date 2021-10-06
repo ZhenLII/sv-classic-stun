@@ -3,7 +3,8 @@ package classicstun.message.enums;
 /**
  * @author JiangZhenli
  */
-public enum ErrorCode {
+public enum ErrorCodeEnum {
+    // 错误码
     BadRequest(400,"Bad Request"),
     Unauthorized(401,"Unauthorized"),
     UnknownAttribute(420,"Unknown Attribute"),
@@ -16,7 +17,7 @@ public enum ErrorCode {
 
     int code;
     String reason;
-    ErrorCode(int code,String reason) {
+    ErrorCodeEnum(int code,String reason) {
         this.code = code;
         this.reason = reason;
     }

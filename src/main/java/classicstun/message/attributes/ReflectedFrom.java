@@ -1,6 +1,9 @@
 package classicstun.message.attributes;
 
 import classicstun.message.enums.MessageAttributeType;
+import classicstun.message.exception.MessageAttributeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.Inet4Address;
 
@@ -8,6 +11,13 @@ import java.net.Inet4Address;
  * @author JiangZhenli
  */
 public class ReflectedFrom extends AddressAttribute {
+
+    private Logger log = LoggerFactory.getLogger(this.getClass());
+
+    ReflectedFrom() {
+        super(MessageAttributeType.REFLECTED_FROM, 0, null);
+    }
+
     public ReflectedFrom(int port, Inet4Address ipAddress) {
         super(MessageAttributeType.REFLECTED_FROM, port, ipAddress);
     }
@@ -17,7 +27,8 @@ public class ReflectedFrom extends AddressAttribute {
         return new byte[0];
     }
 
-    public static ReflectedFrom decode(byte[] bytes) {
-        return null;
+    @Override
+    public void decode(byte[] bytes) throws MessageAttributeException {
+        decodeAddressData(bytes);
     }
 }
