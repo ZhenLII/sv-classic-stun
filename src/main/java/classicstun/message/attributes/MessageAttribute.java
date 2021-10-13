@@ -32,8 +32,9 @@ public abstract class MessageAttribute {
     }};
 
     private MessageAttributeType type;
-    int length;
-    byte[] value;
+    protected int length;
+    protected byte[] value;
+    protected boolean decoded = false;
 
 
     MessageAttribute(MessageAttributeType type) {
@@ -52,9 +53,10 @@ public abstract class MessageAttribute {
      * */
     abstract void decode(byte[] attrValueData) throws MessageAttributeException;
 
-    void setValue (byte[] attrValueData) {
+    void setValue(byte[] attrValueData) {
         this.length = attrValueData.length;
         this.value = attrValueData;
+        this.decoded = true;
     }
 
     /**
