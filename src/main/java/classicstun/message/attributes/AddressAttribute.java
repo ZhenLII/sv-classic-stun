@@ -10,9 +10,6 @@ import org.slf4j.LoggerFactory;
 import java.net.*;
 import java.util.List;
 
-/**
- * @author JiangZhenli
- */
 
 /**
  * @author JiangZhenli
