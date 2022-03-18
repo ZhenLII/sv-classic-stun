@@ -27,7 +27,7 @@ public abstract class MessageAttribute {
         MESSAGE_TYPE.put(MessageAttributeType.PASSWORD, Password.class);
         MESSAGE_TYPE.put(MessageAttributeType.MESSAGE_INTEGRITY, MessageIntegrity.class);
         MESSAGE_TYPE.put(MessageAttributeType.ERROR_CODE, ErrorCode.class);
-        MESSAGE_TYPE.put(MessageAttributeType.UNKNOWN_ATTRIBUTES, UnknowAttribute.class);
+        MESSAGE_TYPE.put(MessageAttributeType.UNKNOWN_ATTRIBUTES, UnknownAttribute.class);
         MESSAGE_TYPE.put(MessageAttributeType.REFLECTED_FROM, ReflectedFrom.class);
     }};
 

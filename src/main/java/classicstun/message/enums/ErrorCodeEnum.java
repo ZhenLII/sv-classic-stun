@@ -21,4 +21,29 @@ public enum ErrorCodeEnum {
         this.code = code;
         this.reason = reason;
     }
+
+    public static ErrorCodeEnum of(int code) {
+        for(ErrorCodeEnum e : ErrorCodeEnum.values()) {
+            if(e.getCode() == code) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
 }

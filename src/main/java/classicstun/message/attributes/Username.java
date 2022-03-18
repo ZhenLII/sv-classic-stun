@@ -32,4 +32,8 @@ public class Username extends MessageAttribute {
         this.username = new String(attributeData);
         this.setValue(attributeData);
     }
+
+    public String getUsername() {
+        return username;
+    }
 }

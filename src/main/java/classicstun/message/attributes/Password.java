@@ -32,4 +32,8 @@ public class Password extends MessageAttribute {
         this.password = new String(attributeData);
         this.setValue(attributeData);
     }
+
+    public String getPassword() {
+        return password;
+    }
 }

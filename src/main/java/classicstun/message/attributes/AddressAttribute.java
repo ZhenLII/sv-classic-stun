@@ -71,4 +71,12 @@ public abstract class AddressAttribute extends MessageAttribute {
         }
 
     }
+
+    public int getPort() {
+        return port;
+    }
+
+    public Inet4Address getIpAddress() {
+        return ipAddress;
+    }
 }

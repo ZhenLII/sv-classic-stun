@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 /**
  * @author JiangZhenli
  */
-public class UnknowAttribute extends MessageAttribute {
+public class UnknownAttribute extends MessageAttribute {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    UnknowAttribute() {
+    UnknownAttribute() {
         super(MessageAttributeType.UNKNOWN_ATTRIBUTES);
     }
 
