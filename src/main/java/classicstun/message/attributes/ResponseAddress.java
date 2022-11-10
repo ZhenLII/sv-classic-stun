@@ -10,7 +10,7 @@ import java.net.Inet4Address;
 /**
  * @author JiangZhenli
  */
-public class ResponseAddress extends AddressAttribute {
+public class ResponseAddress extends AbstractAddressAttribute {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -22,13 +22,4 @@ public class ResponseAddress extends AddressAttribute {
         super(MessageAttributeType.RESPONSE_ADDRESS, port, ipAddress);
     }
 
-    @Override
-    public byte[] encode() {
-        return new byte[0];
-    }
-
-    @Override
-    public void decode(byte[] bytes) throws MessageAttributeException {
-        decodeAddressData(bytes);
-    }
 }

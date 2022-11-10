@@ -22,7 +22,7 @@ import java.util.List;
  * |                             Address                           |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
-public abstract class AddressAttribute extends MessageAttribute {
+public abstract class AbstractAddressAttribute extends MessageAttribute {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -34,17 +34,35 @@ public abstract class AddressAttribute extends MessageAttribute {
             MessageAttributeType.REFLECTED_FROM.value
     );
 
+    byte[] encode() {
+        byte[] bytes = new byte[8];
+        bytes[1] = ADDRESS_FAMILY;
+        byte[] portBytes = ByteUtils.intToByteArray(port);
+        System.arraycopy(portBytes,2,bytes,2,2);
+        if(ipAddress != null) {
+            System.arraycopy(ipAddress.getAddress(),0,bytes,4,4);
+        }
+        return bytes;
+    }
+
+
+    void decode(byte[] attrValueData) throws MessageAttributeException {
+        decodeAddressData(attrValueData);
+    }
+
     // ipv4
-    public static int ADDRESS_FAMILY = 0x01;
+    public static byte ADDRESS_FAMILY = 0x01;
 
     protected int port;
     protected Inet4Address ipAddress;
 
-    AddressAttribute(MessageAttributeType type, int port, Inet4Address ipAddress) {
+    AbstractAddressAttribute(MessageAttributeType type, int port, Inet4Address ipAddress) {
         super(type);
         this.port = port;
         this.ipAddress = ipAddress;
     }
+
+
 
 
     void decodeAddressData(byte[] addrValueData) throws MessageAttributeException {
@@ -52,8 +70,8 @@ public abstract class AddressAttribute extends MessageAttribute {
         if(addrValueData.length != 8) {
             throw new MessageAttributeException("Address Attribute Length Error.");
         }
-        int family = addrValueData[1];
-        if(family != AddressAttribute.ADDRESS_FAMILY) {
+        byte family = addrValueData[1];
+        if(family != AbstractAddressAttribute.ADDRESS_FAMILY) {
             throw new MessageAttributeException("Address Attribute Family Error.");
         }
         byte[] portData = new byte[2];

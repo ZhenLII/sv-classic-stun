@@ -28,11 +28,11 @@ public class ChangeRequest extends MessageAttribute {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private final static int FF = 0; // 0000
-    private final static int FT = 2; // 0010
-    private final static int TF = 4; // 0100
-    private final static int TT = 6; // 0110
-    private final static List<Integer> TruthValues = List.of(FF, FT, TF, TT);
+    private final static byte FF = 0; // 0000
+    private final static byte FT = 2; // 0010
+    private final static byte TF = 4; // 0100
+    private final static byte TT = 6; // 0110
+    private final static List<Byte> TruthValues = List.of(FF, FT, TF, TT);
 
     private boolean changeIp = false;
     private boolean changePort = false;
@@ -49,7 +49,17 @@ public class ChangeRequest extends MessageAttribute {
 
     @Override
     public byte[] encode() {
-        return new byte[0];
+        byte[] bytes = new byte[4];
+        if(changeIp && changePort) {
+            bytes[3] = TT;
+        } else if(changeIp) {
+            bytes[3] = TF;
+        } else if(changePort) {
+            bytes[3] = FT;
+        } else {
+            bytes[3] = FF;
+        }
+        return bytes;
     }
 
     @Override
@@ -60,12 +70,12 @@ public class ChangeRequest extends MessageAttribute {
         if (attributeData[0] != 0 ||
                 attributeData[1] != 0 ||
                 attributeData[2] != 0 ||
-                !TruthValues.contains((int) attributeData[3])
+                !TruthValues.contains(attributeData[3])
         ) {
             throw new MessageAttributeException("Unrecognized ChangeRequest Attribute.");
         }
 
-        switch ((int) attributeData[3]) {
+        switch (attributeData[3]) {
             case FT:
                 changePort = true;
                 break;

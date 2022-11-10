@@ -10,18 +10,18 @@ import org.slf4j.LoggerFactory;
 public class UnknownAttribute extends MessageAttribute {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
-
+    private byte[] unknownType;
     UnknownAttribute() {
         super(MessageAttributeType.UNKNOWN_ATTRIBUTES);
     }
 
     @Override
     public byte[] encode() {
-        return new byte[0];
+        return unknownType;
     }
 
     @Override
     public void decode(byte[] attributeData) {
-
+        this.unknownType = attributeData;
     }
 }

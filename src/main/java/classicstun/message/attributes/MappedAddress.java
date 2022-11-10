@@ -10,7 +10,7 @@ import java.net.Inet4Address;
 /**
  * @author JiangZhenli
  */
-public class MappedAddress extends AddressAttribute {
+public class MappedAddress extends AbstractAddressAttribute {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -23,14 +23,4 @@ public class MappedAddress extends AddressAttribute {
     }
 
 
-    @Override
-    public byte[] encode() {
-        return new byte[0];
-    }
-
-
-    @Override
-    public void decode(byte[] bytes) throws MessageAttributeException {
-        decodeAddressData(bytes);
-    }
 }

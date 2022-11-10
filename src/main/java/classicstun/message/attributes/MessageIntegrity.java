@@ -11,17 +11,19 @@ public class MessageIntegrity extends MessageAttribute {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
+    private byte[] HMAC_SHA1;
+
     MessageIntegrity() {
         super(MessageAttributeType.MESSAGE_INTEGRITY);
     }
 
     @Override
     public byte[] encode() {
-        return new byte[0];
+        return HMAC_SHA1;
     }
 
     @Override
     public void decode(byte[] attributeData) {
-
+        this.HMAC_SHA1 = attributeData;
     }
 }

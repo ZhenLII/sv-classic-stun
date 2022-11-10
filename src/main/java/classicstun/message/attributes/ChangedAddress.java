@@ -12,7 +12,7 @@ import java.net.UnknownHostException;
 /**
  * @author JiangZhenli
  */
-public class ChangedAddress extends AddressAttribute{
+public class ChangedAddress extends AbstractAddressAttribute{
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -24,13 +24,4 @@ public class ChangedAddress extends AddressAttribute{
         super(MessageAttributeType.CHANGED_ADDRESS, port, ipAddress);
     }
 
-    @Override
-    public byte[] encode() {
-        return new byte[0];
-    }
-
-    @Override
-    public void decode(byte[] bytes) throws MessageAttributeException {
-        decodeAddressData(bytes);
-    }
 }

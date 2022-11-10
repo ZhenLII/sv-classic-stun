@@ -45,7 +45,7 @@ public abstract class MessageAttribute {
         return type;
     }
 
-    public abstract byte[] encode();
+    abstract byte[] encode();
 
     /**
      * 将消息中的属性数据解析到对象中

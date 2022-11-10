@@ -40,6 +40,14 @@ public class ErrorCode extends MessageAttribute {
 
     @Override
     public byte[] encode() {
+        byte[] classNumberBytes = new byte[4];
+        if(this.errorCode != null) {
+            int code = this.errorCode.getCode();
+            int hundredsDigit = code / 100;
+            int number = code % (hundredsDigit * 100);
+            System.arraycopy(ByteUtils.intToByteArray(hundredsDigit),1,classNumberBytes,0,3);
+            System.arraycopy(ByteUtils.intToByteArray(number),3,classNumberBytes,3,1);
+        }
         return new byte[0];
     }
 
