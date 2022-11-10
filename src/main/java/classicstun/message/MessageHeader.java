@@ -51,6 +51,17 @@ class MessageHeader {
         this.messageType = messageHeaderType;
     }
 
+    public MessageHeaderType getMessageType() {
+        return messageType;
+    }
+
+    public int getMessageLength() {
+        return messageLength;
+    }
+
+    public String getTansactionId() {
+        return tansactionId;
+    }
 
     byte[] encode() throws MessageHeaderExcepion {
         byte[] messageHeaderCode = new byte[20];
@@ -72,6 +83,7 @@ class MessageHeader {
         }
     }
 
+
     // 初始化一个用于发送的MessageHeader
     static MessageHeader init(MessageHeaderType messageHeaderType) {
         MessageHeader header = new MessageHeader();
@@ -82,7 +94,7 @@ class MessageHeader {
 
     static MessageHeader decode(byte[] bytes) throws MessageHeaderExcepion {
         if (bytes.length < 20) {
-            return null;
+            throw new MessageHeaderExcepion("Decode MessageHeader Failed");
         }
         byte[] messageTypeBytes = new byte[2];
         byte[] messageLengthBytes = new byte[2];
