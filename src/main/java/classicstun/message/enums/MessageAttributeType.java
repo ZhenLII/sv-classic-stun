@@ -1,5 +1,9 @@
 package classicstun.message.enums;
 
+import common.utils.ByteUtils;
+
+import java.util.Arrays;
+
 /**
  * @author JiangZhenli
  */
@@ -34,5 +38,10 @@ public enum MessageAttributeType {
             }
         }
         return null;
+    }
+
+    public byte[] bytes() {
+        byte[] bytes = ByteUtils.intToByteArray(value);
+        return Arrays.copyOfRange(bytes,2,4);
     }
 }
