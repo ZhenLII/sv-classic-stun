@@ -34,7 +34,7 @@ public abstract class AbstractAddressAttribute extends MessageAttribute {
             MessageAttributeType.REFLECTED_FROM.value
     );
 
-    byte[] encode() {
+    public byte[] encodeValue() {
         byte[] bytes = new byte[8];
         bytes[1] = ADDRESS_FAMILY;
         byte[] portBytes = ByteUtils.intToByteArray(port);
@@ -46,7 +46,7 @@ public abstract class AbstractAddressAttribute extends MessageAttribute {
     }
 
 
-    void decode(byte[] attrValueData) throws MessageAttributeException {
+    public void decode(byte[] attrValueData) throws MessageAttributeException {
         decodeAddressData(attrValueData);
     }
 

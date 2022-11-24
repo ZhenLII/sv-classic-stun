@@ -19,7 +19,7 @@ public class Username extends MessageAttribute {
     private String username;
 
     @Override
-    public byte[] encode() {
+    public byte[] encodeValue() {
         byte[] bytes = username.getBytes();
         if(bytes.length <= 0 || bytes.length % 4 != 0) {
             throw new IllegalStateException("Username Length Error.");

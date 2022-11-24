@@ -7,10 +7,7 @@ import common.utils.ByteUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author JiangZhenli
@@ -32,8 +29,8 @@ public abstract class MessageAttribute {
     }};
 
     private MessageAttributeType type;
-    protected int length;
-    protected byte[] value;
+    protected int length = 0;
+    protected byte[] value = null;
     protected boolean decoded = false;
 
 
@@ -45,13 +42,32 @@ public abstract class MessageAttribute {
         return type;
     }
 
-    abstract byte[] encode();
+    public abstract byte[] encodeValue();
+
+    public byte[] encode() {
+        byte[] type = this.type.bytes();
+        byte[] value = encodeValue();
+        byte[] length = Arrays.copyOfRange(ByteUtils.intToByteArray(value.length),2,4);
+        byte[] res = new byte[type.length + length.length + value.length];
+
+        int pos = 0;
+        System.arraycopy(type,0,res,pos,type.length);
+        pos += type.length;
+        System.arraycopy(length,0,res,pos,length.length);
+        pos += length.length;
+        System.arraycopy(value,0,res,pos,value.length);
+        return res;
+    }
+
+    public int length() {
+        return encodeValue().length;
+    }
 
     /**
      * 将消息中的属性数据解析到对象中
      * @param attrValueData TLV结构中的 V value
      * */
-    abstract void decode(byte[] attrValueData) throws MessageAttributeException;
+    public abstract void decode(byte[] attrValueData) throws MessageAttributeException;
 
     void setValue(byte[] attrValueData) {
         this.length = attrValueData.length;

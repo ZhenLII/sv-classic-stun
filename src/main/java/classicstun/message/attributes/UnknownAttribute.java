@@ -16,7 +16,7 @@ public class UnknownAttribute extends MessageAttribute {
     }
 
     @Override
-    public byte[] encode() {
+    public byte[] encodeValue() {
         return unknownType;
     }
 

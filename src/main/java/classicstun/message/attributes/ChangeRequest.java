@@ -48,7 +48,7 @@ public class ChangeRequest extends MessageAttribute {
     }
 
     @Override
-    public byte[] encode() {
+    public byte[] encodeValue() {
         byte[] bytes = new byte[4];
         if(changeIp && changePort) {
             bytes[3] = TT;

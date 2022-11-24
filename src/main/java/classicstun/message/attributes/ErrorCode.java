@@ -39,16 +39,27 @@ public class ErrorCode extends MessageAttribute {
     }
 
     @Override
-    public byte[] encode() {
+    public byte[] encodeValue() {
         byte[] classNumberBytes = new byte[4];
-        if(this.errorCode != null) {
-            int code = this.errorCode.getCode();
-            int hundredsDigit = code / 100;
-            int number = code % (hundredsDigit * 100);
-            System.arraycopy(ByteUtils.intToByteArray(hundredsDigit),1,classNumberBytes,0,3);
-            System.arraycopy(ByteUtils.intToByteArray(number),3,classNumberBytes,3,1);
+        int code = this.errorCode.getCode();
+        int hundredsDigit = code / 100;
+        int number = code % (hundredsDigit * 100);
+        System.arraycopy(ByteUtils.intToByteArray(hundredsDigit),1,classNumberBytes,0,3);
+        System.arraycopy(ByteUtils.intToByteArray(number),3,classNumberBytes,3,1);
+        StringBuilder phrase = new StringBuilder(errorCode.getReason());
+        while (phrase.toString().getBytes().length % 4 != 0) {
+            phrase.append(" ");
         }
-        return new byte[0];
+        byte[] phraseBytes = phrase.toString().getBytes();
+
+        byte[] value = new byte[classNumberBytes.length + phraseBytes.length];
+
+        int pos = 0;
+        System.arraycopy(classNumberBytes,0,value,pos,classNumberBytes.length);
+        pos += classNumberBytes.length;
+        System.arraycopy(phraseBytes,0,classNumberBytes,pos,phraseBytes.length);
+
+        return value;
     }
 
     @Override

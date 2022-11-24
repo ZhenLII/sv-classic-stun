@@ -19,7 +19,7 @@ public class Password extends MessageAttribute {
     private String password;
 
     @Override
-    public byte[] encode() {
+    public byte[] encodeValue() {
         byte[] bytes = password.getBytes();
         if(bytes.length <= 0 || bytes.length % 4 != 0) {
             throw new IllegalStateException("Password Length Error.");

@@ -18,7 +18,7 @@ public class MessageIntegrity extends MessageAttribute {
     }
 
     @Override
-    public byte[] encode() {
+    public byte[] encodeValue() {
         return HMAC_SHA1;
     }
 
