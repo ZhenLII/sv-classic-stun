@@ -2,7 +2,6 @@ package classicstun.message;
 
 import classicstun.message.enums.MessageHeaderType;
 import classicstun.message.exception.MessageHeaderExcepion;
-import common.exception.ByteUiltsException;
 import common.utils.ByteUtils;
 
 import java.util.UUID;
@@ -26,18 +25,21 @@ import java.util.UUID;
  * 参见 RFC3489
  * @author JiangZhenli
  */
-class MessageHeader {
+public class MessageHeader {
     private MessageHeaderType messageType;
     private int messageLength;
-    private String tansactionId;
+    private byte[] transactionId;
 
     private MessageHeader() {
     }
 
-    private MessageHeader(MessageHeaderType messageType, int messageLength, String tansactionId) {
+    private MessageHeader(MessageHeaderType messageType, int messageLength, byte[] transactionId) {
+        if(transactionId.length != 16) {
+            throw new IllegalArgumentException("The length of transactionId must be 16 (byte).");
+        }
         this.messageType = messageType;
         this.messageLength = messageLength;
-        this.tansactionId = tansactionId;
+        this.transactionId = transactionId;
     }
 
     void setMessageLength(int messageLength) throws MessageHeaderExcepion {
@@ -51,17 +53,7 @@ class MessageHeader {
         this.messageType = messageHeaderType;
     }
 
-    public MessageHeaderType getMessageType() {
-        return messageType;
-    }
 
-    public int getMessageLength() {
-        return messageLength;
-    }
-
-    public String getTansactionId() {
-        return tansactionId;
-    }
 
     byte[] encode() throws MessageHeaderExcepion {
         byte[] messageHeaderCode = new byte[20];
@@ -72,24 +64,8 @@ class MessageHeader {
         byte[] messageLengthCode = ByteUtils.intToByteArray(messageLength);
         messageHeaderCode[2] = messageLengthCode[2];
         messageHeaderCode[3] = messageLengthCode[3];
-
-        byte[] tansactionIdbytes;
-        try {
-            tansactionIdbytes = ByteUtils.uuidToByteArray(tansactionId);
-            System.arraycopy(tansactionIdbytes, 0, messageHeaderCode, 4, tansactionIdbytes.length);
-            return messageHeaderCode;
-        } catch (ByteUiltsException e) {
-            throw new MessageHeaderExcepion("Encode MessageHeader Failed");
-        }
-    }
-
-
-    // 初始化一个用于发送的MessageHeader
-    static MessageHeader init(MessageHeaderType messageHeaderType) {
-        MessageHeader header = new MessageHeader();
-        header.messageType = messageHeaderType;
-        header.tansactionId = UUID.randomUUID().toString().replaceAll("-", "");
-        return header;
+        System.arraycopy(transactionId, 0, messageHeaderCode, 4, transactionId.length);
+        return messageHeaderCode;
     }
 
     static MessageHeader decode(byte[] bytes) throws MessageHeaderExcepion {
@@ -101,15 +77,13 @@ class MessageHeader {
         byte[] messageTransactionIdBytes = new byte[16];
         int messageType;
         int messageLength;
-        String transactionId;
-
         try {
             System.arraycopy(bytes, 0, messageTypeBytes, 0, 2);
             System.arraycopy(bytes, 2, messageLengthBytes, 0, 2);
-            System.arraycopy(bytes, 4, messageTypeBytes, 0, 16);
+            System.arraycopy(bytes, 4, messageTransactionIdBytes, 0, 16);
             messageType = ByteUtils.twoBytesToInteger(messageTypeBytes);
             messageLength = ByteUtils.twoBytesToInteger(messageLengthBytes);
-            transactionId = ByteUtils.byteArrayToUUIDString(messageTransactionIdBytes);
+
         } catch (Exception e) {
             throw new MessageHeaderExcepion("Decode MessageHeader Failed");
         }
@@ -121,6 +95,37 @@ class MessageHeader {
             throw new MessageHeaderExcepion("Invalid Message Length");
         }
 
-        return new MessageHeader(type, messageLength, transactionId);
+        return new MessageHeader(type, messageLength, messageTransactionIdBytes);
     }
+
+    public MessageHeaderType getMessageType() {
+        return messageType;
+    }
+
+    public int getMessageLength() {
+        return messageLength;
+    }
+
+    public byte[] getTransactionId() {
+        return transactionId;
+    }
+
+    // 初始化一个用于发送的MessageHeader
+    public static MessageHeader init(MessageHeaderType messageHeaderType, byte[] transactionId, boolean genTransactionId) {
+        MessageHeader header = new MessageHeader();
+        header.messageType = messageHeaderType;
+        if(transactionId != null ) {
+            if( transactionId.length != 16) {
+                throw new IllegalArgumentException("The length of transactionId must be 16 (byte).");
+            }
+            header.transactionId = transactionId;
+        } else if(genTransactionId) {
+            header.transactionId = ByteUtils.uuidToByteArray(UUID.randomUUID());
+        }
+
+        return header;
+    }
+
+
+
 }
