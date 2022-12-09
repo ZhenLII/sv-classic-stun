@@ -45,20 +45,25 @@ public class ChangeRequest extends MessageAttribute {
         super(MessageAttributeType.CHANGE_REQUEST);
         this.changeIp = changeIp;
         this.changePort = changePort;
+
+    }
+
+    public byte truthValue() {
+        if(changeIp && changePort) {
+            return TT;
+        } else if(changeIp) {
+            return TF;
+        } else if(changePort) {
+           return FT;
+        } else {
+            return FF;
+        }
     }
 
     @Override
     public byte[] encodeValue() {
         byte[] bytes = new byte[4];
-        if(changeIp && changePort) {
-            bytes[3] = TT;
-        } else if(changeIp) {
-            bytes[3] = TF;
-        } else if(changePort) {
-            bytes[3] = FT;
-        } else {
-            bytes[3] = FF;
-        }
+        bytes[3] = truthValue();
         return bytes;
     }
 

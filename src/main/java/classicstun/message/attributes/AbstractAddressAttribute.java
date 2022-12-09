@@ -45,7 +45,6 @@ public abstract class AbstractAddressAttribute extends MessageAttribute {
         return bytes;
     }
 
-
     public void decode(byte[] attrValueData) throws MessageAttributeException {
         decodeAddressData(attrValueData);
     }
@@ -62,9 +61,6 @@ public abstract class AbstractAddressAttribute extends MessageAttribute {
         this.ipAddress = ipAddress;
     }
 
-
-
-
     void decodeAddressData(byte[] addrValueData) throws MessageAttributeException {
 
         if(addrValueData.length != 8) {
@@ -76,8 +72,8 @@ public abstract class AbstractAddressAttribute extends MessageAttribute {
         }
         byte[] portData = new byte[2];
         byte[] addressData = new byte[4];
-        System.arraycopy(addrValueData,3,portData,0,2);
-        System.arraycopy(addrValueData,5,addressData,0,4);
+        System.arraycopy(addrValueData,2,portData,0,2);
+        System.arraycopy(addrValueData,4,addressData,0,4);
 
         try {
             this.port= ByteUtils.twoBytesToInteger(portData);
@@ -87,7 +83,6 @@ public abstract class AbstractAddressAttribute extends MessageAttribute {
             log.error(e.getMessage(),e);
             throw new MessageAttributeException("Address Attribute Parse Error");
         }
-
     }
 
     public int getPort() {

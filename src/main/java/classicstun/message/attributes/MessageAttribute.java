@@ -7,6 +7,7 @@ import common.utils.ByteUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
 import java.util.*;
 
 /**
@@ -14,7 +15,8 @@ import java.util.*;
  */
 public abstract class MessageAttribute {
     private static Logger log = LoggerFactory.getLogger(MessageAttribute.class);
-    private final static Map<MessageAttributeType, Class<?>> MESSAGE_TYPE = new HashMap<>() {{
+    private final static Map<MessageAttributeType, Class<?>> MESSAGE_TYPE = new HashMap<>();
+    static {
         MESSAGE_TYPE.put(MessageAttributeType.MAPPED_ADDRESS, MappedAddress.class);
         MESSAGE_TYPE.put(MessageAttributeType.RESPONSE_ADDRESS, ResponseAddress.class);
         MESSAGE_TYPE.put(MessageAttributeType.CHANGE_REQUEST, ChangeRequest.class);
@@ -24,9 +26,9 @@ public abstract class MessageAttribute {
         MESSAGE_TYPE.put(MessageAttributeType.PASSWORD, Password.class);
         MESSAGE_TYPE.put(MessageAttributeType.MESSAGE_INTEGRITY, MessageIntegrity.class);
         MESSAGE_TYPE.put(MessageAttributeType.ERROR_CODE, ErrorCode.class);
-        MESSAGE_TYPE.put(MessageAttributeType.UNKNOWN_ATTRIBUTES, UnknownAttribute.class);
+        MESSAGE_TYPE.put(MessageAttributeType.UNKNOWN_ATTRIBUTES, UnknownAttributes.class);
         MESSAGE_TYPE.put(MessageAttributeType.REFLECTED_FROM, ReflectedFrom.class);
-    }};
+    }
 
     private MessageAttributeType type;
     protected int length = 0;
@@ -82,13 +84,13 @@ public abstract class MessageAttribute {
      */
     public static List<MessageAttribute> parse(byte[] bytes) throws MessageAttributeException {
         if (bytes == null || bytes.length == 0) {
-            return null;
+            return new ArrayList<>();
         }
         if (bytes.length % 4 != 0) {
             throw new MessageAttributeException("Invalid Attributes Data");
         }
         List<MessageAttribute> attributes = new ArrayList<>();
-
+        byte[] unknownAttributesTypes = new byte[0];
         // 2 bytes
         int typeSize = 2;
 
@@ -122,17 +124,35 @@ public abstract class MessageAttribute {
                 byte[] value = new byte[length];
                 System.arraycopy(bytes, pos, value, 0, length);
 
+                //移动到下一个属性
+                pos += length;
 
                 MessageAttributeType typeEnum = MessageAttributeType.of(type);
                 if (typeEnum == null) {
-                    throw new MessageAttributeException("Invalid Attribute Type");
+                    byte[] buf = new byte[unknownAttributesTypes.length + typeSize];
+                    System.arraycopy(unknownAttributesTypes,0,buf,0,unknownAttributesTypes.length);
+                    System.arraycopy(typeData,0,buf,unknownAttributesTypes.length,typeSize);
+                    unknownAttributesTypes = buf;
+                } else {
+                    Constructor constructor =  MESSAGE_TYPE.get(typeEnum).getDeclaredConstructor();
+                    constructor.setAccessible(true);
+                    MessageAttribute attribute = (MessageAttribute) constructor.newInstance();
+                    attribute.decode(value);
+                    attributes.add(attribute);
                 }
 
-                MessageAttribute attribute =
-                        (MessageAttribute) MESSAGE_TYPE.get(typeEnum).getConstructor().newInstance();
-                attribute.decode(value);
-                attributes.add(attribute);
-
+            }
+            if(unknownAttributesTypes.length != 0) {
+                if(unknownAttributesTypes.length % 4 != 0) {
+                    byte[] buf = new byte[unknownAttributesTypes.length + typeSize];
+                    System.arraycopy(unknownAttributesTypes,0,buf,0,unknownAttributesTypes.length);
+                    System.arraycopy(unknownAttributesTypes,unknownAttributesTypes.length - typeSize,buf, unknownAttributesTypes.length, typeSize);
+                    unknownAttributesTypes = buf;
+                }
+                UnknownAttributes unknownAttributes =
+                        (UnknownAttributes) MESSAGE_TYPE.get(MessageAttributeType.UNKNOWN_ATTRIBUTES).getConstructor().newInstance();
+                unknownAttributes.decode(unknownAttributesTypes);
+                attributes.add(unknownAttributes);
             }
         } catch (ByteUiltsException | ReflectiveOperationException e) {
             log.error(e.getMessage(),e);

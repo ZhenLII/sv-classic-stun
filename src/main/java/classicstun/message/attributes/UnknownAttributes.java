@@ -7,21 +7,21 @@ import org.slf4j.LoggerFactory;
 /**
  * @author JiangZhenli
  */
-public class UnknownAttribute extends MessageAttribute {
+public class UnknownAttributes extends MessageAttribute {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
-    private byte[] unknownType;
-    UnknownAttribute() {
+    private byte[] unknownData;
+    UnknownAttributes() {
         super(MessageAttributeType.UNKNOWN_ATTRIBUTES);
     }
 
     @Override
     public byte[] encodeValue() {
-        return unknownType;
+        return unknownData;
     }
 
     @Override
     public void decode(byte[] attributeData) {
-        this.unknownType = attributeData;
+        this.unknownData = attributeData;
     }
 }

@@ -16,6 +16,11 @@ public class Username extends MessageAttribute {
         super(MessageAttributeType.USERNAME);
     }
 
+    public Username(String username) {
+        super(MessageAttributeType.USERNAME);
+        this.username = username;
+    }
+
     private String username;
 
     @Override
