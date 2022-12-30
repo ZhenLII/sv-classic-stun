@@ -42,28 +42,6 @@ public class NoStatusUsername {
     public static final int HMAC_SHA1_LENGTH = 20;
     public static Pattern pattern = Pattern.compile("[A-Z0-9]{6,}-\\d+-[0-9A-F]{8}-[0-9A-F]{40}");
 
-    public static void main(String[] args) throws UnknownHostException {
-
-        NoStatusUsername username = create((Inet4Address) Inet4Address.getByName("127.0.0.1"),"123");
-        System.out.println(username.getPrefix());
-        System.out.println(username.getTenMinuteTimesExpireTimestamp());
-        System.out.println(username.getClientAddress());
-        System.out.println(username.getHmacHexStr());
-        System.out.println(username.getUsername());
-
-        System.out.println(username.getUsername().getBytes().length);
-        System.out.println(isNoStatusUsername(username.getUsername()));
-
-        NoStatusUsername u2 = parse(username.getUsername(),"123");
-        System.out.println(u2.getPrefix());
-        System.out.println(u2.getTenMinuteTimesExpireTimestamp());
-        System.out.println(u2.getClientAddress());
-        System.out.println(u2.getHmacHexStr());
-        System.out.println(u2.getUsername());
-
-        System.out.println(u2.getUsername().getBytes().length);
-        System.out.println(isNoStatusUsername(u2.getUsername()));
-    }
 
     private NoStatusUsername(Inet4Address clientAddress,Long expiredTime,String key) {
         this.clientAddress = clientAddress;
